@@ -74,7 +74,23 @@ using Distance = int;
 // Return value for cases where Duration is unknown
 Distance const NO_DISTANCE = NO_VALUE;
 
+// Type for a place
+struct Place
+{
+    PlaceID id = NO_PLACE;
+    Name name = NO_NAME;
+    PlaceType type = PlaceType::NO_TYPE;
+    Coord coord;
+};
 
+// Type for an area
+struct Area
+{
+    AreaID id = NO_AREA;
+    Name name = NO_NAME;
+    std::vector<Coord> coords;
+    std::vector<Area> subareas;
+};
 
 // This is the class you are supposed to implement
 
