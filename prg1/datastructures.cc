@@ -79,7 +79,7 @@ std::pair<Name, PlaceType> Datastructures::get_place_name_type(PlaceID id)
 Coord Datastructures::get_place_coord(PlaceID id)
 {
     // Replace this comment with your implementation
-    return NO_COORD;
+    return places_[id]->coord;
 }
 
 bool Datastructures::add_area(AreaID id, const Name &name, std::vector<Coord> coords)
