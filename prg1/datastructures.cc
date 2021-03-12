@@ -25,6 +25,7 @@ Type random_in_range(Type start, Type end)
 // warning about unused parameters on operations you haven't yet implemented.)
 
 Datastructures::Datastructures()
+    : places_(), areas_()
 {
     // Replace this comment with your implementation
 }
@@ -36,31 +37,43 @@ Datastructures::~Datastructures()
 
 int Datastructures::place_count()
 {
-    // Replace this comment with your implementation
-    return 0;
+    return places_.size();
 }
 
 void Datastructures::clear_all()
 {
-    // Replace this comment with your implementation
+    places_.clear();
+    areas_.clear();
 }
 
 std::vector<PlaceID> Datastructures::all_places()
 {
     // Replace this comment with your implementation
-    return {};
+    std::vector<PlaceID> place_ids;
+    for (auto place : places_) {
+        place_ids.push_back(place.first);
+    }
+
+    return place_ids;
 }
 
 bool Datastructures::add_place(PlaceID id, const Name& name, PlaceType type, Coord xy)
 {
     // Replace this comment with your implementation
+    if (places_.find(id) == places_.end()) {
+        Place place_to_add = { id, name, type, xy };
+        places_[id] = std::make_shared<Place>(place_to_add);
+        return true;
+    }
+
     return false;
 }
 
 std::pair<Name, PlaceType> Datastructures::get_place_name_type(PlaceID id)
 {
     // Replace this comment with your implementation
-    return {NO_NAME, PlaceType::NO_TYPE};
+
+    return {places_[id]->name, places_[id]->type};
 }
 
 Coord Datastructures::get_place_coord(PlaceID id)

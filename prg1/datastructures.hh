@@ -212,8 +212,8 @@ public:
 
 private:
     // Add stuff needed for your class implementation here
-    std::unordered_map<PlaceID, std::shared_ptr<Place>> _places;
-    std::unordered_map<AreaID, std::shared_ptr<Area>> _areas;
+    std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
+    std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
 
 };
 
