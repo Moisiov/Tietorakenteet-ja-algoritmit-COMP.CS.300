@@ -9,6 +9,7 @@
 #include <utility>
 #include <limits>
 #include <functional>
+#include <memory>
 
 // Types for IDs
 using PlaceID = long int;
@@ -94,7 +95,8 @@ struct Area
     AreaID id = NO_AREA;
     Name name = NO_NAME;
     std::vector<Coord> coords;
-    std::vector<Area> subareas;
+    std::shared_ptr<Area> parent = nullptr;
+    std::vector<std::shared_ptr<Area>> subareas;
 
     bool operator<(const Area& a) const
     {
