@@ -81,6 +81,11 @@ struct Place
     Name name = NO_NAME;
     PlaceType type = PlaceType::NO_TYPE;
     Coord coord;
+
+    bool operator<(const Place& a) const
+    {
+        return name < a.name;
+    }
 };
 
 // Type for an area
@@ -90,6 +95,11 @@ struct Area
     Name name = NO_NAME;
     std::vector<Coord> coords;
     std::vector<Area> subareas;
+
+    bool operator<(const Area& a) const
+    {
+        return name < a.name;
+    }
 };
 
 // This is the class you are supposed to implement
