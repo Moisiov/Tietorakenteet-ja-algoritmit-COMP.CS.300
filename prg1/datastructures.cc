@@ -123,10 +123,18 @@ std::vector<PlaceID> Datastructures::places_alphabetically()
     return sorted;
 }
 
+// check this
 std::vector<PlaceID> Datastructures::places_coord_order()
 {
-    // Replace this comment with your implementation
-    return {};
+    std::vector<std::shared_ptr<Place>> places_to_sort = get_place_vector();
+    std::sort(places_to_sort.begin(), places_to_sort.end(),
+              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
+               { return a->coord < b->coord; });
+
+    std::vector<PlaceID> sorted;
+    std::transform(places_to_sort.begin(), places_to_sort.end(), std::back_inserter(sorted),
+                   [](std::shared_ptr<Place> const& p) -> PlaceID { return p->id; });
+    return sorted;
 }
 
 std::vector<PlaceID> Datastructures::find_places_name(Name const& name)
