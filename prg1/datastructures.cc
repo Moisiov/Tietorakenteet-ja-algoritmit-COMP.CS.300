@@ -69,11 +69,13 @@ bool Datastructures::add_place(PlaceID id, const Name& name, PlaceType type, Coo
     return false;
 }
 
+// check exceptions
 std::pair<Name, PlaceType> Datastructures::get_place_name_type(PlaceID id)
 {
     return {places_[id]->name, places_[id]->type};
 }
 
+// check exceptions
 Coord Datastructures::get_place_coord(PlaceID id)
 {
     return places_[id]->coord;
@@ -81,20 +83,25 @@ Coord Datastructures::get_place_coord(PlaceID id)
 
 bool Datastructures::add_area(AreaID id, const Name &name, std::vector<Coord> coords)
 {
-    // Replace this comment with your implementation
+    if (areas_.find(id) == areas_.end()) {
+        Area area_to_Add = { id, name, coords, nullptr, {} };
+        areas_[id] = std::make_shared<Area>(area_to_Add);
+        return true;
+    }
+
     return false;
 }
 
+// check exceptions
 Name Datastructures::get_area_name(AreaID id)
 {
-    // Replace this comment with your implementation
-    return NO_NAME;
+    return areas_[id]->name;
 }
 
+// check exceptions
 std::vector<Coord> Datastructures::get_area_coords(AreaID id)
 {
-    // Replace this comment with your implementation
-    return {NO_COORD};
+    return areas_[id]->coords;
 }
 
 void Datastructures::creation_finished()
@@ -134,24 +141,24 @@ std::vector<PlaceID> Datastructures::places_coord_order()
 
 std::vector<PlaceID> Datastructures::find_places_name(Name const& name)
 {
-    std::vector<PlaceID> places;
+    std::vector<PlaceID> place_ids;
     for (auto i : places_) {
         if (i.second->name == name) {
-            places.push_back(i.second->id);
+            place_ids.push_back(i.second->id);
         }
     }
-    return places;
+    return place_ids;
 }
 
 std::vector<PlaceID> Datastructures::find_places_type(PlaceType type)
 {
-    std::vector<PlaceID> places;
+    std::vector<PlaceID> place_ids;
     for (auto i : places_) {
         if (i.second->type == type) {
-            places.push_back(i.second->id);
+            place_ids.push_back(i.second->id);
         }
     }
-    return places;
+    return place_ids;
 }
 
 bool Datastructures::change_place_name(PlaceID id, const Name& newname)
@@ -178,19 +185,34 @@ bool Datastructures::change_place_coord(PlaceID id, Coord newcoord)
 
 std::vector<AreaID> Datastructures::all_areas()
 {
-    // Replace this comment with your implementation
-    return {};
+    std::vector<AreaID> area_ids;
+    for (auto i : areas_) {
+        area_ids.push_back(i.first);
+    }
+    return area_ids;
 }
 
 bool Datastructures::add_subarea_to_area(AreaID id, AreaID parentid)
 {
-    // Replace this comment with your implementation
+    if (areas_.find(id) != areas_.end()
+            && areas_.find(parentid) != areas_.end()
+            && areas_[id]->parent == nullptr)
+    {
+        areas_[id]->parent = areas_[parentid];
+        areas_[parentid]->subareas.push_back(areas_[id]);
+        return true;
+    }
     return false;
 }
 
 std::vector<AreaID> Datastructures::subarea_in_areas(AreaID id)
 {
-    // Replace this comment with your implementation
+    if (areas_.find(id) != areas_.end())
+    {
+        std::vector<AreaID> area_ids;
+
+    }
+
     return {NO_AREA};
 }
 
@@ -226,4 +248,15 @@ std::vector<std::shared_ptr<Place>> Datastructures::get_place_vector()
         place_vector.push_back(elem.second);
     }
     return place_vector;
+}
+
+std::vector<std::shared_ptr<Area>> Datastructures::find_parent_areas_recursive(std::shared_ptr<Area> area)
+{
+    std::vector<std::shared_ptr<Area>> areas = {};
+    if (area->parent != nullptr) {
+        areas.push_back(area->parent);
+        std::vector<std::shared_ptr<Area>> parents = find_parent_areas_recursive(area->parent);
+        areas.insert(areas.end(), parents.begin(), parents.end());
+    }
+    return areas;
 }
