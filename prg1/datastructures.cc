@@ -167,7 +167,12 @@ bool Datastructures::change_place_name(PlaceID id, const Name& newname)
 
 bool Datastructures::change_place_coord(PlaceID id, Coord newcoord)
 {
-    // Replace this comment with your implementation
+    if(places_.find(id) != places_.end())
+    {
+        places_[id]->coord = newcoord;
+        return true;
+    }
+
     return false;
 }
 
