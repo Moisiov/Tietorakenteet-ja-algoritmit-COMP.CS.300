@@ -5,6 +5,8 @@
 #include <random>
 
 #include <cmath>
+#include <algorithm>
+#include <iterator>
 
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 
@@ -111,7 +113,15 @@ void Datastructures::creation_finished()
 std::vector<PlaceID> Datastructures::places_alphabetically()
 {
     // Replace this comment with your implementation
-    return {};
+
+    std::vector<Place> places_to_sort(places_.begin(), places_.end());
+    sort(places_to_sort.begin(), places_to_sort.end());
+
+    std::vector<PlaceID> sorted;
+    std::transform(places_to_sort.begin(), places_to_sort.end(), std::back_inserter(sorted),
+                   [](Place const& p) -> PlaceID { return p.id; });
+
+    return sorted;
 }
 
 std::vector<PlaceID> Datastructures::places_coord_order()
