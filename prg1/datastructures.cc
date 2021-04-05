@@ -50,7 +50,6 @@ void Datastructures::clear_all()
 
 std::vector<PlaceID> Datastructures::all_places()
 {
-    // Replace this comment with your implementation
     std::vector<PlaceID> place_ids;
     for (auto place : places_) {
         place_ids.push_back(place.first);
@@ -61,7 +60,6 @@ std::vector<PlaceID> Datastructures::all_places()
 
 bool Datastructures::add_place(PlaceID id, const Name& name, PlaceType type, Coord xy)
 {
-    // Replace this comment with your implementation
     if (places_.find(id) == places_.end()) {
         Place place_to_add = { id, name, type, xy };
         places_[id] = std::make_shared<Place>(place_to_add);
@@ -73,14 +71,11 @@ bool Datastructures::add_place(PlaceID id, const Name& name, PlaceType type, Coo
 
 std::pair<Name, PlaceType> Datastructures::get_place_name_type(PlaceID id)
 {
-    // Replace this comment with your implementation
-
     return {places_[id]->name, places_[id]->type};
 }
 
 Coord Datastructures::get_place_coord(PlaceID id)
 {
-    // Replace this comment with your implementation
     return places_[id]->coord;
 }
 
@@ -139,19 +134,34 @@ std::vector<PlaceID> Datastructures::places_coord_order()
 
 std::vector<PlaceID> Datastructures::find_places_name(Name const& name)
 {
-    // Replace this comment with your implementation
-    return {};
+    std::vector<PlaceID> places;
+    for (auto i : places_) {
+        if (i.second->name == name) {
+            places.push_back(i.second->id);
+        }
+    }
+    return places;
 }
 
 std::vector<PlaceID> Datastructures::find_places_type(PlaceType type)
 {
-    // Replace this comment with your implementation
-    return {};
+    std::vector<PlaceID> places;
+    for (auto i : places_) {
+        if (i.second->type == type) {
+            places.push_back(i.second->id);
+        }
+    }
+    return places;
 }
 
 bool Datastructures::change_place_name(PlaceID id, const Name& newname)
 {
-    // Replace this comment with your implementation
+    if(places_.find(id) != places_.end())
+    {
+        places_[id]->name = newname;
+        return true;
+    }
+
     return false;
 }
 
