@@ -82,11 +82,6 @@ struct Place
     Name name = NO_NAME;
     PlaceType type = PlaceType::NO_TYPE;
     Coord coord;
-
-    bool operator<(const Place& a) const
-    {
-        return name < a.name;
-    }
 };
 
 // Type for an area
@@ -97,11 +92,6 @@ struct Area
     std::vector<Coord> coords;
     std::shared_ptr<Area> parent = nullptr;
     std::vector<std::shared_ptr<Area>> subareas;
-
-    bool operator<(const Area& a) const
-    {
-        return name < a.name;
-    }
 };
 
 // This is the class you are supposed to implement
@@ -214,6 +204,8 @@ private:
     // Add stuff needed for your class implementation here
     std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
     std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
+
+    std::vector<std::shared_ptr<Place>> get_place_vector();
 
 };
 

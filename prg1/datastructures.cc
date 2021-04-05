@@ -112,15 +112,14 @@ void Datastructures::creation_finished()
 
 std::vector<PlaceID> Datastructures::places_alphabetically()
 {
-    // Replace this comment with your implementation
-
-    std::vector<Place> places_to_sort(places_.begin(), places_.end());
-    sort(places_to_sort.begin(), places_to_sort.end());
+    std::vector<std::shared_ptr<Place>> places_to_sort = get_place_vector();
+    std::sort(places_to_sort.begin(), places_to_sort.end(),
+              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
+               { return a->name < b->name; });
 
     std::vector<PlaceID> sorted;
     std::transform(places_to_sort.begin(), places_to_sort.end(), std::back_inserter(sorted),
-                   [](Place const& p) -> PlaceID { return p.id; });
-
+                   [](std::shared_ptr<Place> const& p) -> PlaceID { return p->id; });
     return sorted;
 }
 
@@ -194,4 +193,14 @@ AreaID Datastructures::common_area_of_subareas(AreaID id1, AreaID id2)
 {
     // Replace this comment with your implementation
     return NO_AREA;
+}
+
+std::vector<std::shared_ptr<Place>> Datastructures::get_place_vector()
+{
+    std::vector<std::shared_ptr<Place>> place_vector;
+    for (auto elem : places_)
+    {
+        place_vector.push_back(elem.second);
+    }
+    return place_vector;
 }
