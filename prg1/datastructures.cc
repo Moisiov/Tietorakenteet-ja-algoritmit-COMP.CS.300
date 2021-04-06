@@ -242,7 +242,11 @@ std::vector<PlaceID> Datastructures::places_closest_to(Coord xy, PlaceType type)
 
 bool Datastructures::remove_place(PlaceID id)
 {
-    // Replace this comment with your implementation
+    if (places_.find(id) != places_.end())
+    {
+        places_.erase(id);
+        return true;
+    }
     return false;
 }
 
