@@ -137,13 +137,14 @@ std::vector<PlaceID> Datastructures::places_alphabetically()
     return sorted;
 }
 
+// lisää poikkeustapaukset
 std::vector<PlaceID> Datastructures::places_coord_order()
 {
     std::vector<std::shared_ptr<Place>> places_to_sort = get_place_vector();
     std::sort(places_to_sort.begin(), places_to_sort.end(),
               [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
-               { return sqrt(pow(a->coord.x, 2.0) + pow(a->coord.y, 2.0)) <
-                    sqrt(pow(b->coord.x, 2.0) + pow(b->coord.y, 2.0)); });
+               { return pow(a->coord.x, 2.0) + pow(a->coord.y, 2.0) <
+                    pow(b->coord.x, 2.0) + pow(b->coord.y, 2.0); });
 
     std::vector<PlaceID> sorted;
     std::transform(places_to_sort.begin(), places_to_sort.end(), std::back_inserter(sorted),
