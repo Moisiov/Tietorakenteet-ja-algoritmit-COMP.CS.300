@@ -222,6 +222,12 @@ MainProgram::CmdResult MainProgram::cmd_add_area(std::ostream& output, MainProgr
         coords.push_back({convert_string_to<int>(coord[1]),convert_string_to<int>(coord[2])});
     }
 
+    if (coords.size() < 3)
+    {
+        output << "An area must have at least 3 coords, only " << coords.size() << " coords given!" << endl;
+        return {};
+    }
+
     bool success = ds_.add_area(id, name, coords);
 
     if (success)
@@ -257,9 +263,9 @@ MainProgram::CmdResult MainProgram::cmd_area_name(std::ostream &output, MainProg
 
 void MainProgram::test_area_name()
 {
-    if (random_places_added_ > 0)
+    if (random_areas_added_ > 0)
     {
-        auto id = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
+        auto id = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
         ds_.get_area_name(id);
     }
 }
@@ -279,6 +285,10 @@ MainProgram::CmdResult MainProgram::cmd_area_coords(std::ostream &output, MainPr
         return {};
     }
 
+    if (coords.size() == 1 && coords.front() == NO_COORD)
+    {
+        return {ResultType::AREAIDLIST, MainProgram::CmdResultAreaIDs{NO_AREA}};
+    }
 
     output << "Area "; print_area(id,output,false); output << " has coords:" << endl;
     std::for_each(coords.begin(), coords.end(), [&output,this](auto const& coord){ print_coord(coord,output); });
@@ -393,9 +403,9 @@ MainProgram::CmdResult MainProgram::cmd_subarea_in_areas(std::ostream& output, M
 
 void MainProgram::test_subarea_in_areas()
 {
-    if (random_places_added_ > 0) // Don't do anything if there's no places
+    if (random_areas_added_ > 0) // Don't do anything if there's no places
     {
-        auto id = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
+        auto id = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
         ds_.subarea_in_areas(id);
     }
 }
@@ -411,15 +421,16 @@ MainProgram::CmdResult MainProgram::cmd_all_subareas_in_area(std::ostream &outpu
     print_area(id, output);
 
     auto result = ds_.all_subareas_in_area(id);
+    sort(result.begin(), result.end());
     if (result.empty()) { output << "No subareas found." << endl; }
     return {ResultType::AREAIDLIST, result};
 }
 
 void MainProgram::test_all_subareas_in_area()
 {
-    if (random_places_added_ > 0) // Don't do anything if there's no places
+    if (random_areas_added_ > 0) // Don't do anything if there's no places
     {
-        auto id = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
+        auto id = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
         ds_.all_subareas_in_area(id);
     }
 }
@@ -466,6 +477,7 @@ MainProgram::CmdResult MainProgram::cmd_common_area_of_subareas(std::ostream &ou
     if (result == NO_AREA)
     {
         output << "No common area found!" << endl;
+        return {};
     }
 
     output << "Common area of areas "; print_area(id1, output, false); output << " and "; print_area(id2, output, false); output << " is:" << endl;
@@ -474,10 +486,10 @@ MainProgram::CmdResult MainProgram::cmd_common_area_of_subareas(std::ostream &ou
 
 void MainProgram::test_common_area_of_subareas()
 {
-    if (random_places_added_ > 0) // Don't do anything if there's no places
+    if (random_areas_added_ > 0) // Don't do anything if there's no places
     {
-        auto id1 = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
-        auto id2 = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
+        auto id1 = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
+        auto id2 = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
         ds_.common_area_of_subareas(id1, id2);
     }
 }
@@ -528,19 +540,21 @@ void MainProgram::add_random_places_areas(unsigned int size, Coord min, Coord ma
         // Add a new area for every 10 places
         if (random_places_added_ % 10 == 0)
         {
-            auto areaid = random_places_added_ / 10;
+            auto areaid = n_to_areaid(random_areas_added_);
             vector<Coord> coords;
             for (int j=0; j<3; ++j)
             {
                 coords.push_back({random<int>(min.x, max.x),random<int>(min.y, max.y)});
             }
             ds_.add_area(areaid, convert_to_string(areaid), std::move(coords));
-            // Add area as subarea for some earlier area
-            if (random_places_added_/10 > 0)
+            // Add area as subarea so that we get a binary tree
+            if (random_areas_added_ > 0)
             {
-                auto parentid = random<decltype(random_places_added_)>(0, random_places_added_/10);
+//                auto parentid = random<decltype(random_areas_added_)>(0, random_areas_added_);
+                auto parentid = n_to_areaid(random_areas_added_ / 2);
                 ds_.add_subarea_to_area(areaid, parentid);
             }
+            ++random_areas_added_;
         }
 
         ++random_places_added_;
@@ -626,13 +640,24 @@ MainProgram::CmdResult MainProgram::cmd_randseed(std::ostream& output, MatchIter
 MainProgram::CmdResult MainProgram::cmd_read(std::ostream& output, MatchIter begin, MatchIter end)
 {
     string filename = *begin++;
+    string silentstr =  *begin++;
     assert( begin == end && "Impossible number of parameters!");
+
+    bool silent = !silentstr.empty();
+    ostream* new_output = &output;
+
+    ostringstream dummystr; // Given as output if "silent" is specified, the output is discarded
+    if (silent)
+    {
+        new_output = &dummystr;
+    }
 
     ifstream input(filename);
     if (input)
     {
         output << "** Commands from '" << filename << "'" << endl;
-        command_parser(input, output, PromptStyle::NORMAL);
+        command_parser(input, *new_output, PromptStyle::NORMAL);
+        if (silent) { output << "...(output discarded in silent mode)..." << endl; }
         output << "** End of commands from '" << filename << "'" << endl;
     }
     else
@@ -959,12 +984,16 @@ std::string MainProgram::print_coord(Coord coord, std::ostream& output, bool nl)
     }
 }
 
-MainProgram::CmdResult MainProgram::cmd_find_places_name(std::ostream& /*output*/, MatchIter begin, MatchIter end)
+MainProgram::CmdResult MainProgram::cmd_find_places_name(std::ostream& output, MatchIter begin, MatchIter end)
 {
     string name = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
     auto result = ds_.find_places_name(name);
+    if (result.empty())
+    {
+        output << "No Places!" << std::endl;
+    }
 
     sort(result.begin(), result.end());
     return {ResultType::PLACEIDLIST, CmdResultPlaceIDs{NO_AREA, result}};
@@ -993,6 +1022,10 @@ MainProgram::CmdResult MainProgram::cmd_find_places_type(std::ostream &output, M
     }
 
     auto result = ds_.find_places_type(type);
+    if (result.empty())
+    {
+        output << "No Places!" << std::endl;
+    }
 
     sort(result.begin(), result.end());
     return {ResultType::PLACEIDLIST, CmdResultPlaceIDs{NO_AREA, result}};
@@ -1038,16 +1071,16 @@ vector<MainProgram::CmdInfo> MainProgram::cmds_ =
     {"places_closest_to", "Coord [type] (type optional)", coordx+"(?:"+wsx+typex+")?", &MainProgram::cmd_places_closest_to, &MainProgram::test_places_closest_to },
     {"common_area_of_subareas", "ID1 ID2", plcidx+wsx+plcidx, &MainProgram::cmd_common_area_of_subareas, &MainProgram::test_common_area_of_subareas },
     {"remove_place", "ID", plcidx, &MainProgram::cmd_remove_place, &MainProgram::test_remove_place },
-    {"find_places_name", "name", namex, &MainProgram::cmd_find_places_name, &MainProgram::test_find_places_name },
+    {"find_places_name", "'Name'", namex, &MainProgram::cmd_find_places_name, &MainProgram::test_find_places_name },
     {"find_places_type", "type", typex, &MainProgram::cmd_find_places_type, &MainProgram::test_find_places_type },
-    {"change_place_name", "ID newname", plcidx+wsx+namex, &MainProgram::cmd_change_place_name, &MainProgram::test_change_place_name },
+    {"change_place_name", "ID 'Newname'", plcidx+wsx+namex, &MainProgram::cmd_change_place_name, &MainProgram::test_change_place_name },
     {"change_place_coord", "ID (x,y)", plcidx+wsx+coordx, &MainProgram::cmd_change_place_coord, &MainProgram::test_change_place_coord },
     {"add_subarea_to_area", "SubareaID AreaID", areaidx+wsx+areaidx, &MainProgram::cmd_add_subarea_to_area, nullptr },
     {"subarea_in_areas", "AreaID", areaidx, &MainProgram::cmd_subarea_in_areas, &MainProgram::test_subarea_in_areas },
     {"all_subareas_in_area", "AreaID", areaidx, &MainProgram::cmd_all_subareas_in_area, &MainProgram::test_all_subareas_in_area },
     {"quit", "", "", nullptr, nullptr },
     {"help", "", "", &MainProgram::help_command, nullptr },
-    {"read", "\"in-filename\"", "\"([-a-zA-Z0-9 ./:_]+)\"", &MainProgram::cmd_read, nullptr },
+    {"read", "\"in-filename\" [silent]", "\"([-a-zA-Z0-9 ./:_]+)\"(?:"+wsx+"(silent))?", &MainProgram::cmd_read, nullptr },
     {"testread", "\"in-filename\" \"out-filename\"", "\"([-a-zA-Z0-9 ./:_]+)\""+wsx+"\"([-a-zA-Z0-9 ./:_]+)\"", &MainProgram::cmd_testread, nullptr },
     {"perftest", "cmd1|all|compulsory[;cmd2...] timeout repeat_count n1[;n2...] (parts in [] are optional, alternatives separated by |)",
      "([0-9a-zA-Z_]+(?:;[0-9a-zA-Z_]+)*)"+wsx+numx+wsx+numx+wsx+"([0-9]+(?:;[0-9]+)*)", &MainProgram::cmd_perftest, nullptr },
@@ -1213,7 +1246,10 @@ MainProgram::CmdResult MainProgram::cmd_perftest(std::ostream& output, MatchIter
                     PlaceID id = random<decltype(random_places_added_)>(0, random_places_added_);
                     ds_.get_place_name_type(id);
                     ds_.get_place_coord(id);
-                    auto areaid = n_to_areaid(random<decltype(random_places_added_)>(0, (random_places_added_-1)/10+1));
+                }
+                if (random_areas_added_ > 0)
+                {
+                    auto areaid = n_to_areaid(random<decltype(random_areas_added_)>(0, random_areas_added_));
                     ds_.get_area_name(areaid);
                 }
             }
@@ -1643,6 +1679,7 @@ void MainProgram::init_primes()
     prime1_ = primes1[random<int>(0, primes1.size())];
     prime2_ = primes2[random<int>(0, primes2.size())];
     random_places_added_ = 0;
+    random_areas_added_ = 0;
     random_ways_added_ = 0;
 }
 
