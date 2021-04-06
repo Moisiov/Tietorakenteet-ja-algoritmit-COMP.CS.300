@@ -215,10 +215,9 @@ private:
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
     std::vector<std::shared_ptr<Area>> find_subareas_recursive(std::shared_ptr<Area> area);
-    void calculate_place_kdtree();
-    std::shared_ptr<KDTree_Node> insert_kdtree_node_recursive(std::shared_ptr<KDTree_Node> root,
-                                                              std::shared_ptr<Place> place,
-                                                              unsigned depth = 0);
+
+    void find_neighbors_recursive(std::vector<std::shared_ptr<Place>> nearest);
+    unsigned calculate_coord_distance(Coord c1, Coord c2);
 };
 
 #endif // DATASTRUCTURES_HH

@@ -237,7 +237,7 @@ std::vector<AreaID> Datastructures::subarea_in_areas(AreaID id)
 
 std::vector<PlaceID> Datastructures::places_closest_to(Coord xy, PlaceType type)
 {
-    calculate_place_kdtree();
+    // calculate_place_kdtree();
     return {};
 }
 
@@ -309,39 +309,12 @@ std::vector<std::shared_ptr<Area>> Datastructures::find_subareas_recursive(std::
     return areas;
 }
 
-void Datastructures::calculate_place_kdtree()
+void find_neighbors_recursive(std::vector<std::shared_ptr<Place>> nearest)
 {
-    std::shared_ptr<KDTree_Node> root = nullptr;
 
-    for(auto i : places_)
-    {
-        root = insert_kdtree_node_recursive(root, i.second);
-    }
-    kdtree_root_ = root;
 }
 
-std::shared_ptr<KDTree_Node> Datastructures::insert_kdtree_node_recursive(std::shared_ptr<KDTree_Node> root,
-                                                                          std::shared_ptr<Place> place,
-                                                                          unsigned int depth)
+unsigned calculate_coord_distance(Coord c1, Coord c2)
 {
-    if (root == nullptr)
-    {
-        KDTree_Node node = { place };
-        std::shared_ptr<KDTree_Node> node_ptr = std::make_shared<KDTree_Node>(node);
-        return node_ptr;
-    }
-
-    unsigned dimension = depth % 2;
-
-    if ((dimension == 0 && place->coord.x < root->place->coord.x)
-         || (dimension == 1 && place->coord.y < root->place->coord.y))
-    {
-        root->left = insert_kdtree_node_recursive(root->left, place, depth+1);
-    }
-    else
-    {
-        root->right = insert_kdtree_node_recursive(root->right, place, depth+1);
-    }
-
-    return root;
+    return pow(c1.x - c2.x, 2) + pow(c1.y - c2.y, 2);
 }
