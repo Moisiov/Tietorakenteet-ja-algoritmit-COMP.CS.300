@@ -94,6 +94,13 @@ struct Area
     std::vector<std::shared_ptr<Area>> subareas;
 };
 
+struct KDTree_Node
+{
+    std::shared_ptr<Place> place = nullptr;
+    std::shared_ptr<KDTree_Node> left = nullptr;
+    std::shared_ptr<KDTree_Node> right = nullptr;
+};
+
 // This is the class you are supposed to implement
 
 class Datastructures
@@ -201,13 +208,17 @@ public:
     AreaID common_area_of_subareas(AreaID id1, AreaID id2);
 
 private:
-    // Add stuff needed for your class implementation here
     std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
     std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
+    std::shared_ptr<KDTree_Node> kdtree_root_;
 
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
     std::vector<std::shared_ptr<Area>> find_subareas_recursive(std::shared_ptr<Area> area);
+    void calculate_place_kdtree();
+    std::shared_ptr<KDTree_Node> insert_kdtree_node_recursive(std::shared_ptr<KDTree_Node> root,
+                                                              std::shared_ptr<Place> place,
+                                                              unsigned depth = 0);
 };
 
 #endif // DATASTRUCTURES_HH
