@@ -237,7 +237,16 @@ std::vector<AreaID> Datastructures::subarea_in_areas(AreaID id)
 
 std::vector<PlaceID> Datastructures::places_closest_to(Coord xy, PlaceType type)
 {
-    // calculate_place_kdtree();
+    std::vector<std::shared_ptr<Place>> places_x_sort = get_place_vector();
+    std::sort(places_x_sort.begin(), places_x_sort.end(),
+              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
+               { return a->coord.x < b->coord.x; });
+
+    std::vector<std::shared_ptr<Place>> places_y_sort(places_x_sort);
+    std::sort(places_y_sort.begin(), places_y_sort.end(),
+              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
+               { return a->coord.y < b->coord.y; });
+
     return {};
 }
 
@@ -268,7 +277,15 @@ std::vector<AreaID> Datastructures::all_subareas_in_area(AreaID id)
 
 AreaID Datastructures::common_area_of_subareas(AreaID id1, AreaID id2)
 {
-    // Replace this comment with your implementation
+    if (areas_.find(id1) != areas_.end()
+            && areas_.find(id2) != areas_.end()
+            && areas_[id1]->parent != nullptr
+            && areas_[id2]->parent != nullptr)
+    {
+        std::vector<std::shared_ptr<Area>> parents = find_parent_areas_recursive(areas_[id1]);
+        return find_common_parent_recursive(parents, areas_[id2]);
+    }
+
     return NO_AREA;
 }
 
@@ -309,9 +326,17 @@ std::vector<std::shared_ptr<Area>> Datastructures::find_subareas_recursive(std::
     return areas;
 }
 
-void find_neighbors_recursive(std::vector<std::shared_ptr<Place>> nearest)
+AreaID Datastructures::find_common_parent_recursive(std::vector<std::shared_ptr<Area>> &parents, std::shared_ptr<Area> area)
 {
-
+    if (area->parent == nullptr)
+    {
+        return NO_AREA;
+    }
+    if (std::find(parents.begin(), parents.end(), area->parent) != parents.end())
+    {
+        return area->parent->id;
+    }
+    return find_common_parent_recursive(parents, area->parent);
 }
 
 unsigned calculate_coord_distance(Coord c1, Coord c2)
