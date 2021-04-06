@@ -136,7 +136,6 @@ std::vector<PlaceID> Datastructures::places_alphabetically()
     return sorted;
 }
 
-// lisää poikkeustapaukset
 std::vector<PlaceID> Datastructures::places_coord_order()
 {
     std::vector<std::shared_ptr<Place>> places_to_sort = get_place_vector();
@@ -241,17 +240,22 @@ std::vector<AreaID> Datastructures::subarea_in_areas(AreaID id)
 
 std::vector<PlaceID> Datastructures::places_closest_to(Coord xy, PlaceType type)
 {
-    /*std::vector<std::shared_ptr<Place>> places_x_sort = get_place_vector();
-    std::sort(places_x_sort.begin(), places_x_sort.end(),
-              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
-               { return a->coord.x < b->coord.x; });
+    std::vector<PlaceID> nearest_ids;
+    std::vector<std::shared_ptr<Place>> nearest = find_nearest_brute_force(xy, type);
+    std::sort(nearest.begin(), nearest.end(),
+              [this, xy](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
+               { double dist_a = calculate_coord_distance(xy, a->coord);
+                 double dist_b = calculate_coord_distance(xy, b->coord);
+                 if (dist_a == dist_b)
+                 {
+                     return a->coord.y < b->coord.y;
+                 }
+                 return dist_a < dist_b; });
 
-    std::vector<std::shared_ptr<Place>> places_y_sort(places_x_sort);
-    std::sort(places_y_sort.begin(), places_y_sort.end(),
-              [](const std::shared_ptr<Place>& a, const std::shared_ptr<Place>& b)
-               { return a->coord.y < b->coord.y; });*/
+    std::transform(nearest.begin(), nearest.end(), std::back_inserter(nearest_ids),
+                   [](std::shared_ptr<Place> const& p) -> PlaceID { return p->id; });
 
-    return {};
+    return nearest_ids;
 }
 
 bool Datastructures::remove_place(PlaceID id)
@@ -343,18 +347,58 @@ AreaID Datastructures::find_common_parent_recursive(std::vector<std::shared_ptr<
     return find_common_parent_recursive(parents, area->parent);
 }
 
-/*std::vector<std::shared_ptr<Place>> Datastructures::find_nearest_brute_force(Coord xy, PlaceType type)
+// really ugly -> do smth to this
+std::vector<std::shared_ptr<Place>> Datastructures::find_nearest_brute_force(Coord xy, PlaceType type)
 {
     std::vector<std::pair<unsigned, std::shared_ptr<Place>>> nearest;
+    unsigned highest_dist;
 
     for (auto i : places_)
     {
-        if(nearest.size() < 3)
+        unsigned dist = calculate_coord_distance(xy, i.second->coord);
+        if(nearest.size() < 3 && (type == PlaceType::NO_TYPE || type == i.second->type))
         {
-            nearest.push_back(std::make_pair(calculate_coord_distance(xy, i.second->coord), i.second));
+            if (!highest_dist || dist > highest_dist)
+            {
+                highest_dist = dist;
+            }
+            nearest.push_back(std::make_pair(dist, i.second));
+        }
+        else if (type == PlaceType::NO_TYPE || type == i.second->type)
+        {
+            if (dist <= highest_dist)
+            {
+                auto it = std::find_if(nearest.begin(), nearest.end(),
+                                       [highest_dist](const std::pair<unsigned, std::shared_ptr<Place>> p)
+                                       { return p.first == highest_dist; });
+
+                if (it != nearest.end()
+                        && (dist < highest_dist
+                            || i.second->coord.y < it->second->coord.y))
+                {
+                    *it = std::make_pair(dist, i.second);
+
+                    // calculate highest
+                    highest_dist = 0;
+                    for (auto near : nearest)
+                    {
+                        if (near.first > highest_dist)
+                        {
+                            highest_dist = near.first;
+                        }
+                    }
+                }
+            }
         }
     }
-}*/
+
+    std::vector<std::shared_ptr<Place>> result;
+    std::transform(nearest.begin(), nearest.end(), std::back_inserter(result),
+                   [](std::pair<unsigned, std::shared_ptr<Place>> const& p)
+            -> std::shared_ptr<Place>{ return p.second; });
+
+    return result;
+}
 
 unsigned Datastructures::calculate_coord_distance(Coord c1, Coord c2)
 {

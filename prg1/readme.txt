@@ -13,5 +13,5 @@ Operations:
     The compulsory operations are quite straight-forward and no unnecessary gimmickry was needed.
     Finding the parent and subareas were implemented as recursive operations.
 
-    Only two of the non-compulsory operations were finished as the programmer ran out of time
+    Non-compulsory operations were finished in quite a hurry as the programmer ran out of time
     (skiing accident and a broken wrist, finally got the plaster off a couple of days ago).
