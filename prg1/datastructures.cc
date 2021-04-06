@@ -69,16 +69,22 @@ bool Datastructures::add_place(PlaceID id, const Name& name, PlaceType type, Coo
     return false;
 }
 
-// check exceptions
 std::pair<Name, PlaceType> Datastructures::get_place_name_type(PlaceID id)
 {
-    return {places_[id]->name, places_[id]->type};
+    if (places_.find(id) != places_.end())
+    {
+        return {places_[id]->name, places_[id]->type};
+    }
+    return {NO_NAME, PlaceType::NO_TYPE};
 }
 
-// check exceptions
 Coord Datastructures::get_place_coord(PlaceID id)
 {
-    return places_[id]->coord;
+    if (places_.find(id) != places_.end())
+    {
+        return places_[id]->coord;
+    }
+    return NO_COORD;
 }
 
 bool Datastructures::add_area(AreaID id, const Name &name, std::vector<Coord> coords)
@@ -92,16 +98,22 @@ bool Datastructures::add_area(AreaID id, const Name &name, std::vector<Coord> co
     return false;
 }
 
-// check exceptions
 Name Datastructures::get_area_name(AreaID id)
 {
-    return areas_[id]->name;
+    if (areas_.find(id) != areas_.end())
+    {
+        return areas_[id]->name;
+    }
+    return NO_NAME;
 }
 
-// check exceptions
 std::vector<Coord> Datastructures::get_area_coords(AreaID id)
 {
-    return areas_[id]->coords;
+    if (areas_.find(id) != areas_.end())
+    {
+        return areas_[id]->coords;
+    }
+    return {NO_COORD};
 }
 
 void Datastructures::creation_finished()
