@@ -208,7 +208,7 @@ private:
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
     std::vector<std::shared_ptr<Area>> find_subareas_recursive(std::shared_ptr<Area> area);
     AreaID find_common_parent_recursive(std::vector<std::shared_ptr<Area>> &parent, std::shared_ptr<Area> area);
-
+    // std::vector<std::shared_ptr<Place>> find_nearest_brute_force(Coord xy, PlaceType type);
     unsigned calculate_coord_distance(Coord c1, Coord c2);
 };
 
