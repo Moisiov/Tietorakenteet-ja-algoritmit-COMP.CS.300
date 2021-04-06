@@ -51,9 +51,8 @@ void Datastructures::clear_all()
 std::vector<PlaceID> Datastructures::all_places()
 {
     std::vector<PlaceID> place_ids;
-    for (auto place : places_) {
-        place_ids.push_back(place.first);
-    }
+    std::transform(places_.begin(), places_.end(), std::back_inserter(place_ids),
+                   [](std::pair<PlaceID, std::shared_ptr<Place>> const& p) -> PlaceID { return p.second->id; });
 
     return place_ids;
 }
