@@ -51,3 +51,6 @@ FORMS += \
 #FORMS -= mainprogram.ui
 #CONFIG -= core gui qt
 #CONFIG += console
+
+DISTFILES += \
+    readme.txt
