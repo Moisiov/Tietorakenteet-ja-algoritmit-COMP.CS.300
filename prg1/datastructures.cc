@@ -210,7 +210,13 @@ std::vector<AreaID> Datastructures::subarea_in_areas(AreaID id)
     if (areas_.find(id) != areas_.end())
     {
         std::vector<AreaID> area_ids;
+        std::vector<std::shared_ptr<Area>> parents = find_parent_areas_recursive(areas_[id]);
+        for (auto i : parents)
+        {
+            area_ids.push_back(i->id);
+        }
 
+        return area_ids;
     }
 
     return {NO_AREA};
@@ -230,7 +236,16 @@ bool Datastructures::remove_place(PlaceID id)
 
 std::vector<AreaID> Datastructures::all_subareas_in_area(AreaID id)
 {
-    // Replace this comment with your implementation
+    if (areas_.find(id) != areas_.end())
+    {
+        std::vector<AreaID> area_ids;
+        std::vector<std::shared_ptr<Area>> subareas = find_subareas_recursive(areas_[id]);
+        for (auto i : subareas)
+        {
+            area_ids.push_back(i->id);
+        }
+        return area_ids;
+    }
     return {NO_AREA};
 }
 
@@ -258,5 +273,21 @@ std::vector<std::shared_ptr<Area>> Datastructures::find_parent_areas_recursive(s
         std::vector<std::shared_ptr<Area>> parents = find_parent_areas_recursive(area->parent);
         areas.insert(areas.end(), parents.begin(), parents.end());
     }
+    return areas;
+}
+
+std::vector<std::shared_ptr<Area>> Datastructures::find_subareas_recursive(std::shared_ptr<Area> area)
+{
+    std::vector<std::shared_ptr<Area>> areas = {};
+    if (!area->subareas.empty())
+    {
+        areas.insert(areas.end(), area->subareas.begin(), area->subareas.end());
+        for (auto i : area->subareas)
+        {
+            std::vector<std::shared_ptr<Area>> subareas = find_subareas_recursive(i);
+            areas.insert(areas.end(), subareas.begin(), subareas.end());
+        }
+    }
+
     return areas;
 }

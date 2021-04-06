@@ -207,7 +207,7 @@ private:
 
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
-
+    std::vector<std::shared_ptr<Area>> find_subareas_recursive(std::shared_ptr<Area> area);
 };
 
 #endif // DATASTRUCTURES_HH
