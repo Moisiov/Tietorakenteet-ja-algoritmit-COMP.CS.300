@@ -83,7 +83,6 @@ struct Place
     Coord coord = NO_COORD;
 };
 
-// Type for an area
 struct Area
 {
     AreaID id = NO_AREA;
@@ -93,6 +92,12 @@ struct Area
     std::vector<std::shared_ptr<Area>> subareas;
 };
 
+struct Way
+{
+    WayID id = NO_WAY;
+    std::vector<Coord> coords;
+    double length = 0;
+};
 
 // This is the class you are supposed to implement
 
