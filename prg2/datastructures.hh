@@ -216,28 +216,28 @@ public:
 
     // Phase 2 operations
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: std::transorfm
     std::vector<WayID> all_ways();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: std::find
     bool add_way(WayID id, std::vector<Coord> coords);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: iterates through all ways
     std::vector<std::pair<WayID, Coord>> ways_from(Coord xy);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: std::find
     std::vector<Coord> get_way_coords(WayID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map::clear
     void clear_ways();
     
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: each node is traversed once
     std::vector<std::tuple<Coord, WayID, Distance>> route_any(Coord fromxy, Coord toxy);
 
     // Non-compulsory operations

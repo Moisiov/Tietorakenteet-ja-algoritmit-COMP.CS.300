@@ -511,7 +511,6 @@ bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
         };
         ways_[id] = std::make_shared<Way>(way_to_add);
 
-        // Add weak pointers to crossroads_
         if(crossroads_.find(coords.front()) == crossroads_.end())
         {
             crossroads_[coords.front()] = {id};
