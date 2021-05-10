@@ -419,7 +419,8 @@ unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
 
 std::vector<std::tuple<Coord, WayID, Distance>> Datastructures::astar(Coord c1, Coord c2)
 {
-    return {{NO_COORD, NO_WAY, NO_DISTANCE}};
+
+    return {};
 }
 
 std::vector<WayID> Datastructures::all_ways()
@@ -501,8 +502,13 @@ void Datastructures::clear_ways()
 
 std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::route_any(Coord fromxy, Coord toxy)
 {
-    // Replace this comment with your implementation
-    return {{NO_COORD, NO_WAY, NO_DISTANCE}};
+    if (crossroads_.find(fromxy) == crossroads_.end()
+            || crossroads_.find(toxy) == crossroads_.end())
+    {
+        return {{NO_COORD, NO_WAY, NO_DISTANCE}};
+    }
+
+    return astar(fromxy, toxy);
 }
 
 bool Datastructures::remove_way(WayID id)

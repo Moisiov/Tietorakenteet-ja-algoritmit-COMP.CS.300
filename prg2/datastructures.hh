@@ -100,6 +100,14 @@ struct Way
     unsigned length = 0; // length is meters to power of 2
 };
 
+struct Node
+{
+    Coord pos = NO_COORD;
+    unsigned g = 0;
+    unsigned h = 0;
+    unsigned f = 0;
+};
+
 // This is the class you are supposed to implement
 
 class Datastructures
