@@ -7,6 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iterator>
+#include <stack>
 
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 
@@ -419,7 +420,53 @@ unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
 
 std::vector<std::tuple<Coord, WayID, Distance>> Datastructures::astar(Coord c1, Coord c2)
 {
+    return {};
+}
 
+std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::dfs(Coord c1, Coord c2)
+{
+    std::vector<std::tuple<Coord, WayID, Distance>> result = {std::make_tuple(c1, NO_WAY, 0)};
+    bool found = false;
+    std::stack<Coord> stk;
+    std::unordered_set<Coord, CoordHash> visited = {c1};
+    stk.push(c1);
+
+    while (!stk.empty())
+    {
+        c1 = stk.top();
+        stk.pop();
+        if (c1 == c2)
+        {
+            found = true;
+        }
+        else if (!found)
+        {
+            for (auto &way_id : crossroads_[c1])
+            {
+                std::vector<Coord> coords = ways_[way_id]->coords;
+                if(visited.find(coords.front()) == visited.end())
+                {
+                    stk.push(coords.front());
+                    visited.insert(coords.front());
+                }
+                else if(visited.find(coords.back()) == visited.end())
+                {
+                    stk.push(coords.back());
+                    visited.insert(coords.back());
+                }
+            }
+        }
+        else
+        {
+            result.push_back(std::make_tuple(c1, NO_WAY, 3));
+        }
+    }
+
+    if (found)
+    {
+        result.push_back(std::make_tuple(c2, NO_WAY, 3));
+        return result;
+    }
     return {};
 }
 
@@ -508,7 +555,7 @@ std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::route_any(Coord
         return {{NO_COORD, NO_WAY, NO_DISTANCE}};
     }
 
-    return astar(fromxy, toxy);
+    return dfs(fromxy, toxy);
 }
 
 bool Datastructures::remove_way(WayID id)

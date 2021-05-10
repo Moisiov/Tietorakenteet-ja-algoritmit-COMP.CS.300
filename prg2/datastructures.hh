@@ -282,6 +282,7 @@ private:
 
     // Pathfinding algorithms
     std::vector<std::tuple<Coord, WayID, Distance>> astar(Coord c1, Coord c2);
+    std::vector<std::tuple<Coord, WayID, Distance>> dfs(Coord c1, Coord c2);
 };
 
 #endif // DATASTRUCTURES_HH
