@@ -428,7 +428,16 @@ std::vector<WayID> Datastructures::all_ways()
 
 bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
 {   
-
+    if (ways_.find(id) != ways_.end())
+    {
+        Way way_to_add = {
+            id,
+            coords,
+            calculate_way_length(coords)
+        };
+        ways_[id] = std::make_shared<Way>(way_to_add);
+        return true;
+    }
     return false;
 }
 
