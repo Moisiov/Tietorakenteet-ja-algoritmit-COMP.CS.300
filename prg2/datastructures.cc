@@ -443,13 +443,28 @@ bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
 
 std::vector<std::pair<WayID, Coord>> Datastructures::ways_from(Coord xy)
 {
-    // Replace this comment with your implementation
-    return {{NO_WAY, NO_COORD}};
+    std::vector<std::pair<WayID, Coord>> found_ways;
+    for(auto way : ways_)
+    {
+        if(way.second->coords.front() == xy)
+        {
+            found_ways.push_back({way.first, way.second->coords.back()});
+        }
+        else if(way.second->coords.back() == xy)
+        {
+            found_ways.push_back({way.first, way.second->coords.front()});
+        }
+    }
+
+    return found_ways;
 }
 
 std::vector<Coord> Datastructures::get_way_coords(WayID id)
 {
-    // Replace this comment with your implementation
+    if (ways_.find(id) != ways_.end())
+    {
+        return ways_[id]->coords;
+    }
     return {NO_COORD};
 }
 
