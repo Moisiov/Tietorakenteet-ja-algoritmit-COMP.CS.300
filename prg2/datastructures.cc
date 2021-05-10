@@ -419,7 +419,7 @@ unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
 
 std::vector<WayID> Datastructures::all_ways()
 {
-    std::vector<WayID> way_ids = {};
+    std::vector<WayID> way_ids;
     std::transform(ways_.begin(), ways_.end(), std::back_inserter(way_ids),
                    [](std::pair<WayID, std::shared_ptr<Way>> const& w)
             -> WayID { return w.first; });
@@ -428,7 +428,7 @@ std::vector<WayID> Datastructures::all_ways()
 
 bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
 {   
-    if (ways_.find(id) != ways_.end())
+    if (ways_.find(id) == ways_.end())
     {
         Way way_to_add = {
             id,
