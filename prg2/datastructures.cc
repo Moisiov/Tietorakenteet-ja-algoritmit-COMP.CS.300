@@ -425,46 +425,67 @@ std::vector<std::tuple<Coord, WayID, Distance>> Datastructures::astar(Coord c1, 
 
 std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::dfs(Coord c1, Coord c2)
 {
-    std::vector<std::tuple<Coord, WayID, Distance>> result = {std::make_tuple(c1, NO_WAY, 0)};
     bool found = false;
     std::stack<Coord> stk;
     std::unordered_set<Coord, CoordHash> visited = {c1};
+    std::unordered_map<Coord, std::tuple<Coord, WayID>, CoordHash> parent_map;
     stk.push(c1);
 
-    while (!stk.empty())
+    Coord current_coord;
+
+    while (!stk.empty() && !found)
     {
-        c1 = stk.top();
+        current_coord = stk.top();
         stk.pop();
-        if (c1 == c2)
+        if (current_coord == c2)
         {
             found = true;
+            break;
         }
-        else if (!found)
+
+        for (auto &way_id : crossroads_[current_coord])
         {
-            for (auto &way_id : crossroads_[c1])
+            std::vector<Coord> coords = ways_[way_id]->coords;
+            if(visited.find(coords.front()) == visited.end())
             {
-                std::vector<Coord> coords = ways_[way_id]->coords;
-                if(visited.find(coords.front()) == visited.end())
-                {
-                    stk.push(coords.front());
-                    visited.insert(coords.front());
-                }
-                else if(visited.find(coords.back()) == visited.end())
-                {
-                    stk.push(coords.back());
-                    visited.insert(coords.back());
-                }
+                stk.push(coords.front());
+                visited.insert(coords.front());
+                parent_map[coords.front()] = std::make_tuple(current_coord, way_id);
             }
-        }
-        else
-        {
-            result.push_back(std::make_tuple(c1, NO_WAY, 3));
+            else if(visited.find(coords.back()) == visited.end())
+            {
+                stk.push(coords.back());
+                visited.insert(coords.back());
+                parent_map[coords.back()] = std::make_tuple(current_coord, way_id);
+            }
         }
     }
 
     if (found)
     {
-        result.push_back(std::make_tuple(c2, NO_WAY, 3));
+        std::vector<std::tuple<Coord, WayID, Distance>> result;
+        std::vector<std::tuple<Coord, WayID>> route;
+
+        Coord current = c2;
+        while(current != c1)
+        {
+            route.push_back(std::make_tuple(current, std::get<1>(parent_map.at(current))));
+            current = std::get<0>(parent_map.at(current));
+        }
+        route.push_back(std::make_tuple(c1, NO_WAY));
+
+        Distance tot_dist = 0;
+        for (auto it = route.rbegin(); it != route.rend(); ++it)
+        {
+            WayID id = std::get<1>(*it);
+            if (ways_.find(id) != ways_.end())
+            {
+                tot_dist += sqrt(ways_[id]->length);
+            }
+
+            result.push_back(std::tuple_cat(*it, std::make_tuple(tot_dist)));
+        }
+
         return result;
     }
     return {};
