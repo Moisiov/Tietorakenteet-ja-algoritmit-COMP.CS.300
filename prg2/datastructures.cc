@@ -27,7 +27,7 @@ Type random_in_range(Type start, Type end)
 // warning about unused parameters on operations you haven't yet implemented.)
 
 Datastructures::Datastructures()
-    : places_(), areas_(), ways_()
+    : places_(), areas_(), ways_(), crossroads_()
 {
     // Replace this comment with your implementation
 }
@@ -417,6 +417,11 @@ unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
     return len;
 }
 
+std::vector<std::tuple<Coord, WayID, Distance>> Datastructures::astar(Coord c1, Coord c2)
+{
+    return {{NO_COORD, NO_WAY, NO_DISTANCE}};
+}
+
 std::vector<WayID> Datastructures::all_ways()
 {
     std::vector<WayID> way_ids;
@@ -436,6 +441,26 @@ bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
             calculate_way_length(coords)
         };
         ways_[id] = std::make_shared<Way>(way_to_add);
+
+        // Add weak pointers to crossroads_
+        if(crossroads_.find(coords.front()) == crossroads_.end())
+        {
+            crossroads_[coords.front()] = {std::weak_ptr<Way>(ways_[id])};
+        }
+        else
+        {
+            crossroads_[coords.front()].insert(std::weak_ptr<Way>(ways_[id]));
+        }
+
+        if(crossroads_.find(coords.back()) == crossroads_.end())
+        {
+            crossroads_[coords.back()] = {std::weak_ptr<Way>(ways_[id])};
+        }
+        else
+        {
+            crossroads_[coords.back()].insert(std::weak_ptr<Way>(ways_[id]));
+        }
+
         return true;
     }
     return false;
@@ -481,7 +506,11 @@ std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::route_any(Coord
 
 bool Datastructures::remove_way(WayID id)
 {
-    // Replace this comment with your implementation
+    if(ways_.find(id) != ways_.end())
+    {
+        ways_.erase(id);
+        return true;
+    }
     return false;
 }
 

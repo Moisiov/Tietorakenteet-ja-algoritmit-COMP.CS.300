@@ -10,6 +10,7 @@
 #include <limits>
 #include <functional>
 #include <memory>
+#include <unordered_set>
 
 // Types for IDs
 using PlaceID = long long int;
@@ -96,7 +97,7 @@ struct Way
 {
     WayID id = NO_WAY;
     std::vector<Coord> coords;
-    unsigned length = 0;
+    unsigned length = 0; // length is meters to power of 2
 };
 
 // This is the class you are supposed to implement
@@ -261,6 +262,7 @@ private:
     std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
     std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
     std::unordered_map<WayID, std::shared_ptr<Way>> ways_;
+    std::unordered_map<Coord, std::unordered_set<std::weak_ptr<Way>>, CoordHash> crossroads_;
 
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
@@ -269,6 +271,9 @@ private:
     std::vector<std::shared_ptr<Place>> find_nearest_brute_force(Coord xy, PlaceType type);
     unsigned calculate_coord_distance(Coord c1, Coord c2);
     unsigned calculate_way_length(std::vector<Coord> coords);
+
+    // Pathfinding algorithms
+    std::vector<std::tuple<Coord, WayID, Distance>> astar(Coord c1, Coord c2);
 };
 
 #endif // DATASTRUCTURES_HH
