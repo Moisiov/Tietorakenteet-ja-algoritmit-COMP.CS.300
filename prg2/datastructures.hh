@@ -262,7 +262,7 @@ private:
     std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
     std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
     std::unordered_map<WayID, std::shared_ptr<Way>> ways_;
-    std::unordered_map<Coord, std::unordered_set<std::weak_ptr<Way>>, CoordHash> crossroads_;
+    std::unordered_map<Coord, std::unordered_set<WayID>, CoordHash> crossroads_;
 
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);

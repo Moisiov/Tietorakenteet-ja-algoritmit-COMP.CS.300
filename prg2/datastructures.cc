@@ -445,20 +445,20 @@ bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
         // Add weak pointers to crossroads_
         if(crossroads_.find(coords.front()) == crossroads_.end())
         {
-            crossroads_[coords.front()] = {std::weak_ptr<Way>(ways_[id])};
+            crossroads_[coords.front()] = {id};
         }
         else
         {
-            crossroads_[coords.front()].insert(std::weak_ptr<Way>(ways_[id]));
+            crossroads_[coords.front()].insert(id);
         }
 
         if(crossroads_.find(coords.back()) == crossroads_.end())
         {
-            crossroads_[coords.back()] = {std::weak_ptr<Way>(ways_[id])};
+            crossroads_[coords.back()] = {id};
         }
         else
         {
-            crossroads_[coords.back()].insert(std::weak_ptr<Way>(ways_[id]));
+            crossroads_[coords.back()].insert(id);
         }
 
         return true;
@@ -496,6 +496,7 @@ std::vector<Coord> Datastructures::get_way_coords(WayID id)
 void Datastructures::clear_ways()
 {
     ways_.clear();
+    crossroads_.clear();
 }
 
 std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::route_any(Coord fromxy, Coord toxy)
