@@ -27,7 +27,7 @@ Type random_in_range(Type start, Type end)
 // warning about unused parameters on operations you haven't yet implemented.)
 
 Datastructures::Datastructures()
-    : places_(), areas_()
+    : places_(), areas_(), ways_()
 {
     // Replace this comment with your implementation
 }
@@ -407,8 +407,11 @@ unsigned Datastructures::calculate_coord_distance(Coord c1, Coord c2)
 
 std::vector<WayID> Datastructures::all_ways()
 {
-    // Replace this comment with your implementation
-    return {};
+    std::vector<WayID> way_ids = {};
+    std::transform(ways_.begin(), ways_.end(), std::back_inserter(way_ids),
+                   [](std::pair<WayID, std::shared_ptr<Way>> const& w)
+            -> WayID{ return w.first; });
+    return way_ids;
 }
 
 bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
@@ -431,7 +434,7 @@ std::vector<Coord> Datastructures::get_way_coords(WayID id)
 
 void Datastructures::clear_ways()
 {
-    // Replace this comment with your implementation
+    ways_.clear();
 }
 
 std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::route_any(Coord fromxy, Coord toxy)

@@ -226,7 +226,8 @@ public:
     // Estimate of performance:
     // Short rationale for estimate:
     void clear_ways();
-
+    
+    // DFS with direction and some magic?
     // Estimate of performance:
     // Short rationale for estimate:
     std::vector<std::tuple<Coord, WayID, Distance>> route_any(Coord fromxy, Coord toxy);
@@ -237,14 +238,17 @@ public:
     // Short rationale for estimate:
     bool remove_way(WayID id);
 
+    // DFS with crossroads tracking variable (start with shortest or any?)
     // Estimate of performance:
     // Short rationale for estimate:
     std::vector<std::tuple<Coord, WayID, Distance>> route_least_crossroads(Coord fromxy, Coord toxy);
 
+    // ????
     // Estimate of performance:
     // Short rationale for estimate:
     std::vector<std::tuple<Coord, WayID>> route_with_cycle(Coord fromxy);
 
+    // A*
     // Estimate of performance:
     // Short rationale for estimate:
     std::vector<std::tuple<Coord, WayID, Distance>> route_shortest_distance(Coord fromxy, Coord toxy);
@@ -256,6 +260,7 @@ public:
 private:
     std::unordered_map<PlaceID, std::shared_ptr<Place>> places_;
     std::unordered_map<AreaID, std::shared_ptr<Area>> areas_;
+    std::unordered_map<WayID, std::shared_ptr<Way>> ways_;
 
     std::vector<std::shared_ptr<Place>> get_place_vector();
     std::vector<std::shared_ptr<Area>> find_parent_areas_recursive(std::shared_ptr<Area> area);
