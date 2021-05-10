@@ -407,15 +407,15 @@ unsigned Datastructures::calculate_coord_distance(Coord c1, Coord c2)
     return pow(c1.x - c2.x, 2) + pow(c1.y - c2.y, 2);
 }
 
-unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
+Distance Datastructures::calculate_way_length(std::vector<Coord> coords)
 {
     unsigned len = 0;
-    for(unsigned i = 0; i < coords.size() - 2; i++)
+    for(unsigned i = 0; i < coords.size() - 1; i++)
     {
-        len += calculate_coord_distance(coords.at(i), coords.at(i+1));
+        len += sqrt(calculate_coord_distance(coords.at(i), coords.at(i+1)));
     }
 
-    return len;
+    return (Distance)len;
 }
 
 std::vector<std::tuple<Coord, WayID, Distance>> Datastructures::astar(Coord c1, Coord c2)
@@ -480,7 +480,7 @@ std::vector<std::tuple<Coord, WayID, Distance> > Datastructures::dfs(Coord c1, C
             WayID id = std::get<1>(*it);
             if (ways_.find(id) != ways_.end())
             {
-                tot_dist += sqrt(ways_[id]->length);
+                tot_dist += ways_[id]->length;
             }
 
             result.push_back(std::tuple_cat(*it, std::make_tuple(tot_dist)));
