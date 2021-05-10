@@ -100,6 +100,7 @@ struct Way
     Distance length = 0;
 };
 
+// Not used
 struct Node
 {
     Coord pos = NO_COORD;
