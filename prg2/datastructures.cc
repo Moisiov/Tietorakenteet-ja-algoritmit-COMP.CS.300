@@ -52,7 +52,8 @@ std::vector<PlaceID> Datastructures::all_places()
 {
     std::vector<PlaceID> place_ids;
     std::transform(places_.begin(), places_.end(), std::back_inserter(place_ids),
-                   [](std::pair<PlaceID, std::shared_ptr<Place>> const& p) -> PlaceID { return p.second->id; });
+                   [](std::pair<PlaceID, std::shared_ptr<Place>> const& p)
+            -> PlaceID { return p.second->id; });
 
     return place_ids;
 }
@@ -405,18 +406,29 @@ unsigned Datastructures::calculate_coord_distance(Coord c1, Coord c2)
     return pow(c1.x - c2.x, 2) + pow(c1.y - c2.y, 2);
 }
 
+unsigned Datastructures::calculate_way_length(std::vector<Coord> coords)
+{
+    unsigned len = 0;
+    for(unsigned i = 0; i < coords.size() - 2; i++)
+    {
+        len += calculate_coord_distance(coords.at(i), coords.at(i+1));
+    }
+
+    return len;
+}
+
 std::vector<WayID> Datastructures::all_ways()
 {
     std::vector<WayID> way_ids = {};
     std::transform(ways_.begin(), ways_.end(), std::back_inserter(way_ids),
                    [](std::pair<WayID, std::shared_ptr<Way>> const& w)
-            -> WayID{ return w.first; });
+            -> WayID { return w.first; });
     return way_ids;
 }
 
 bool Datastructures::add_way(WayID id, std::vector<Coord> coords)
 {   
-    // Replace this comment with your implementation
+
     return false;
 }
 

@@ -96,7 +96,7 @@ struct Way
 {
     WayID id = NO_WAY;
     std::vector<Coord> coords;
-    double length = 0;
+    unsigned length = 0;
 };
 
 // This is the class you are supposed to implement
@@ -268,6 +268,7 @@ private:
     AreaID find_common_parent_recursive(std::vector<std::shared_ptr<Area>> &parent, std::shared_ptr<Area> area);
     std::vector<std::shared_ptr<Place>> find_nearest_brute_force(Coord xy, PlaceType type);
     unsigned calculate_coord_distance(Coord c1, Coord c2);
+    unsigned calculate_way_length(std::vector<Coord> coords);
 };
 
 #endif // DATASTRUCTURES_HH
